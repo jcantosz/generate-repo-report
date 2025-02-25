@@ -1,0 +1,46 @@
+name: Generate report
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    env:
+      org: "jcantosz-test-org"
+      TOKEN: ${{ secrets.TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          gh extension install mona-actions/gh-repo-stats
+          gh extension install timrogers/gh-migration-audit
+
+      - name: Generate repo-stats report
+        run: |
+          gh repo-stats 
+            --org ${{ env.org }} \
+            --token $TOKEN \
+            --token-type user
+
+          mv "${{ env.org }}-all_repos-*.csv" repo-stats.csv
+
+      - name: generate migration-audit report
+        run: |
+          gh migration-audit audit-all \
+            --access-token $TOKEN \
+            --owner ${{ env.org }} \
+            --owner-type user \
+            --output-path migration-audit.csv
+
+      - name: Commit and push changes
+        run: |
+          node dist/index.js
+      - name: upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: report
+          path: output.csv
+          retention-days: 1
