@@ -30,7 +30,9 @@ jobs:
             --token ${GH_TOKEN} \
             --token-type user
 
-          mv "${ORG}-all_repos-*.csv" repo-stats.csv
+          ls -la
+
+          mv *.csv repo-stats.csv
 
       - name: generate migration-audit report
         run: |
