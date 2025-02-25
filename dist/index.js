@@ -903,7 +903,9 @@ const combineData = (firstCsvData, secondCsvData) => {
 
   return firstCsvData.map((firstRow) => {
     const matchingRows = secondCsvData.filter(
-      (secondRow) => firstRow.Org_Name === secondRow.owner && firstRow.Repo_Name === secondRow.name
+      (secondRow) =>
+        firstRow.Org_Name.toLowerCase() === secondRow.owner.toLowerCase() &&
+        firstRow.Repo_Name.toLowerCase() === secondRow.name.toLowerCase()
     );
 
     const combinedRow = { ...firstRow, Has_Unmigratable: matchingRows.length > 0 };
@@ -915,7 +917,7 @@ const combineData = (firstCsvData, secondCsvData) => {
     // Set remaining new rows to false
     types.forEach((type) => {
       if (!combinedRow[type]) {
-        combinedRow[type] = false;
+        combinedRow[type] = "";
       }
     });
 
@@ -934,15 +936,18 @@ const writeCsvFile = (filePath, headers, data) => {
 
 const processCsvFiles = async () => {
   try {
+    console.log(`Reading input CSVs: ${repoStatsFile}, ${migrationAuditFile}`);
     const [firstCsvData, secondCsvData] = await Promise.all([
       readCsvFile(repoStatsFile),
       readCsvFile(migrationAuditFile),
     ]);
 
+    console.log("Combining data");
     const combinedData = combineData(firstCsvData, secondCsvData);
 
     const headers = [...Object.keys(firstCsvData[0]), "Has_Unmigratable", ...Array.from(types)];
 
+    console.log(`Writing ${outputCsvFile}`);
     await writeCsvFile(outputCsvFile, headers, combinedData);
 
     console.log("The CSV file was written successfully");

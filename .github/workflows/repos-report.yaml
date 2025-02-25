@@ -1,7 +1,9 @@
 name: Generate report
 on:
   workflow_dispatch:
-
+  push:
+    branches:
+      - main
 jobs:
   generate-report:
     runs-on: ubuntu-latest
