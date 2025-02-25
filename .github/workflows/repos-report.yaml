@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       org: "jcantosz-test-org"
-      TOKEN: ${{ secrets.TOKEN }}
+      GH_TOKEN: "${{ secrets.TOKEN }}"
 
     steps:
       - name: Checkout repository
@@ -22,7 +22,7 @@ jobs:
         run: |
           gh repo-stats 
             --org ${{ env.org }} \
-            --token $TOKEN \
+            --token ${GH_TOKEN} \
             --token-type user
 
           mv "${{ env.org }}-all_repos-*.csv" repo-stats.csv
@@ -30,7 +30,7 @@ jobs:
       - name: generate migration-audit report
         run: |
           gh migration-audit audit-all \
-            --access-token $TOKEN \
+            --access-token ${GH_TOKEN} \
             --owner ${{ env.org }} \
             --owner-type user \
             --output-path migration-audit.csv
