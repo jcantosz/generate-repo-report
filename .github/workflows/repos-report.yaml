@@ -20,7 +20,12 @@ jobs:
 
       - name: Generate repo-stats report
         run: |
-          gh repo-stats 
+          echo gh repo-stats \
+            --org ${ORG} \
+            --token ${GH_TOKEN} \
+            --token-type user
+
+          gh repo-stats \
             --org ${ORG} \
             --token ${GH_TOKEN} \
             --token-type user
@@ -29,6 +34,12 @@ jobs:
 
       - name: generate migration-audit report
         run: |
+          echo gh migration-audit audit-all \
+            --access-token ${GH_TOKEN} \
+            --owner ${ORG} \
+            --owner-type user \
+            --output-path migration-audit.csv
+
           gh migration-audit audit-all \
             --access-token ${GH_TOKEN} \
             --owner ${ORG} \
