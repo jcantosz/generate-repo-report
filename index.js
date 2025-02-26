@@ -40,14 +40,16 @@ const combineStatsAndAuditData = (repoStatsData, migrationAuditData) => {
 
     const combinedRow = { ...repoStatsRow, Has_Unmigratable: matchingRows.length > 0 };
 
+    // If the output displays a count, capture that, otherwise set the row to true
     matchingRows.forEach((row) => {
-      combinedRow[row.type] = true; // or row.message;
+      const messageDigits = row.message.match(/\d+/);
+      combinedRow[row.type] = messageDigits ? messageDigits[0] : "1+";
     });
 
-    // Set remaining new rows to false
+    // Set remaining new rows to 0
     migrationTypes.forEach((type) => {
       if (!combinedRow[type]) {
-        combinedRow[type] = false;
+        combinedRow[type] = 0;
       }
     });
 
