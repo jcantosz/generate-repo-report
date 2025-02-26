@@ -880,44 +880,52 @@ const fs = __nccwpck_require__(147);
 const csv = __nccwpck_require__(265);
 const createCsvWriter = (__nccwpck_require__(214)/* .createObjectCsvWriter */ .eD);
 
-const repoStatsFile = "repo-stats.csv";
-const migrationAuditFile = "migration-audit.csv";
-const outputCsvFile = "output.csv";
+const repoStatsFilePath = "repo-stats.csv";
+const migrationAuditFilePath = "migration-audit.csv";
+const outputCsvFilePath = "output.csv";
 
-const types = new Set();
+// All the 'type's in the migration audit output
+const migrationTypes = new Set();
 
-const readCsvFile = (filePath) => {
+const readCsv = (filePath) => {
   return new Promise((resolve, reject) => {
     const data = [];
     fs.createReadStream(filePath)
       .pipe(csv())
       .on("data", (row) => data.push(row))
-      .on("end", () => resolve(data))
+      .on("end", () => {
+        console.log(`\tRead "${filePath}"`);
+        resolve(data);
+      })
       .on("error", (error) => reject(error));
   });
 };
 
 // Combine data from both CSV files
-const combineData = (firstCsvData, secondCsvData) => {
-  secondCsvData.forEach((row) => types.add(row.type));
+const combineStatsAndAuditData = (repoStatsData, migrationAuditData) => {
+  migrationAuditData.forEach((row) => migrationTypes.add(row.type));
 
-  return firstCsvData.map((firstRow) => {
-    const matchingRows = secondCsvData.filter(
-      (secondRow) =>
-        firstRow.Org_Name.toLowerCase() === secondRow.owner.toLowerCase() &&
-        firstRow.Repo_Name.toLowerCase() === secondRow.name.toLowerCase()
+  // For each row of repoStats, find matching rows in migrationAudit
+  // Create a new combined row and fill in data for each available migrationAudit header
+  return repoStatsData.map((repoStatsRow) => {
+    console.log(`\tProcessing "${repoStatsRow.Org_Name}/${repoStatsRow.Repo_Name}"`);
+
+    const matchingRows = migrationAuditData.filter(
+      (migrationAuditRow) =>
+        repoStatsRow.Org_Name.toLowerCase() === migrationAuditRow.owner.toLowerCase() &&
+        repoStatsRow.Repo_Name.toLowerCase() === migrationAuditRow.name.toLowerCase()
     );
 
-    const combinedRow = { ...firstRow, Has_Unmigratable: matchingRows.length > 0 };
+    const combinedRow = { ...repoStatsRow, Has_Unmigratable: matchingRows.length > 0 };
 
     matchingRows.forEach((row) => {
       combinedRow[row.type] = true; // or row.message;
     });
 
     // Set remaining new rows to false
-    types.forEach((type) => {
+    migrationTypes.forEach((type) => {
       if (!combinedRow[type]) {
-        combinedRow[type] = "";
+        combinedRow[type] = false;
       }
     });
 
@@ -925,7 +933,7 @@ const combineData = (firstCsvData, secondCsvData) => {
   });
 };
 
-const writeCsvFile = (filePath, headers, data) => {
+const writeCsv = (filePath, headers, data) => {
   const csvWriter = createCsvWriter({
     path: filePath,
     header: headers.map((header) => ({ id: header, title: header })),
@@ -936,19 +944,19 @@ const writeCsvFile = (filePath, headers, data) => {
 
 const processCsvFiles = async () => {
   try {
-    console.log(`Reading input CSVs: ${repoStatsFile}, ${migrationAuditFile}`);
-    const [firstCsvData, secondCsvData] = await Promise.all([
-      readCsvFile(repoStatsFile),
-      readCsvFile(migrationAuditFile),
+    console.log(`Reading input CSVs: "${repoStatsFilePath}", "${migrationAuditFilePath}"`);
+    const [repoStatsData, migrationAuditData] = await Promise.all([
+      readCsv(repoStatsFilePath),
+      readCsv(migrationAuditFilePath),
     ]);
 
     console.log("Combining data");
-    const combinedData = combineData(firstCsvData, secondCsvData);
+    const combinedData = combineStatsAndAuditData(repoStatsData, migrationAuditData);
 
-    const headers = [...Object.keys(firstCsvData[0]), "Has_Unmigratable", ...Array.from(types)];
+    const headers = [...Object.keys(repoStatsData[0]), "Has_Unmigratable", ...Array.from(migrationTypes)];
 
-    console.log(`Writing ${outputCsvFile}`);
-    await writeCsvFile(outputCsvFile, headers, combinedData);
+    console.log(`Writing "${outputCsvFilePath}"`);
+    await writeCsv(outputCsvFilePath, headers, combinedData);
 
     console.log("The CSV file was written successfully");
   } catch (error) {
