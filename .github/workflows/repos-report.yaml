@@ -50,10 +50,11 @@ jobs:
             --owner-type user \
             --output-path migration-audit.csv
 
-      - name: Commit and push changes
+      - name: Combine reports
         run: |
           node dist/index.js
-      - name: upload report
+
+      - name: upload combined report
         uses: actions/upload-artifact@v4
         with:
           name: report
