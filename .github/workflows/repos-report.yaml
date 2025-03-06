@@ -58,10 +58,7 @@ jobs:
 
       - uses: jcantosz/Count-repo-projects@main
         with:
-          github_app_id: ${{ secrets.GITHUB_APP_ID }}
-          github_private_key: ${{ secrets.GITHUB_PRIVATE_KEY }}
-          github_installation_id: ${{ secrets.GITHUB_INSTALLATION_ID }}
-          api_url: ${{ secrets.API_URL }}
+          github_token: ${{ secrets.TOKEN }}
           repos_file: 'repos.txt'
           org_name: 'jcantosz-test-org'
           output_file: 'repo-projects.csv'
