@@ -69,7 +69,7 @@ jobs:
         uses: jcantosz/generate-repo-report@main
         with:
           base_csv_file: 'repo-stats.csv'
-          additional_csv_file: 'repo-project.csv'
+          additional_csv_file: 'repo-projects.csv'
           output_file: 'stats-and-projects.csv'
           base_csv_columns: 'Org_Name,Repo_Name'
           additional_csv_columns: 'org_name,repo_name'
