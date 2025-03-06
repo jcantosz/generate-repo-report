@@ -50,9 +50,56 @@ jobs:
             --owner-type user \
             --output-path migration-audit.csv
 
-      - name: Combine reports
+      # uses the token to get a list of repos and saves them to a file, 1 repo per line
+      - name: Get list of repos
         run: |
-          node dist/index.js
+          echo gh repo list ${ORG} --json name --jq '.[] | "\(.name)"' \| tee repos.txt
+          gh repo list ${ORG} --json name --jq '.[] | "\(.name)"' | tee repos.txt
+
+      - uses: jcantosz/Count-repo-projects@main
+        with:
+          github_app_id: ${{ secrets.GITHUB_APP_ID }}
+          github_private_key: ${{ secrets.GITHUB_PRIVATE_KEY }}
+          github_installation_id: ${{ secrets.GITHUB_INSTALLATION_ID }}
+          api_url: ${{ secrets.API_URL }}
+          repos_file: 'repos.txt'
+          org_name: 'jcantosz-test-org'
+          output_file: 'repo-projects.csv'
+
+      # combine repo proects and repo stats by calling generate-repo-report in direct mode
+      - name: Combine reports
+        id: combine-reports
+        uses: jcantosz/generate-repo-report@main
+        with:
+          base_csv_file: 'repo-stats.csv'
+          additional_csv_file: 'repo-project.csv'
+          output_file: 'stats-and-projects.csv'
+          base_csv_columns: 'Org_Name,Repo_Name'
+          additional_csv_columns: 'org_name,repo_name'
+          mode: 'direct'
+      
+      - uses: jcantosz/generate-repo-report@main
+        with:
+          base_csv_file: 'stats-and-projects.csv'
+          additional_csv_file: 'migration-audit.csv'
+          output_file: 'combined-output.csv'
+          header_column: 'type'
+          base_csv_columns: 'Org_Name,Repo_Name'
+          additional_csv_columns: 'owner,name'
+          mode: 'default'
+      
+        # or, to call directly
+        #   - name: Combine reports
+        # run: |
+        #   node dist/index.js
+        # env:
+        #   INPUT_BASE_CSV_FILE: 'repo-stats.csv'
+        #   INPUT_ADDITIONAL_CSV_FILE: 'migration-audit.csv'
+        #   INPUT_OUTPUT_FILE: 'output.csv'
+        #   INPUT_HEADER_COLUMN: 'type'
+        #   INPUT_BASE_CSV_COLUMNS: 'Org_Name,Repo_Name'
+        #   INPUT_ADDITIONAL_CSV_COLUMNS: 'owner,name'
+        #   INPUT_MODE: 'default'
 
       - name: upload combined report
         uses: actions/upload-artifact@v4

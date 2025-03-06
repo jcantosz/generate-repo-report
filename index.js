@@ -1,90 +1,44 @@
-const fs = require("fs");
-const csv = require("csv-parser");
-const createCsvWriter = require("csv-writer").createObjectCsvWriter;
+const core = require('@actions/core');
+const { readCsv, writeCsv, combineBaseAndAdditionalData, determineHeaders } = require('./src/utils');
 
-const repoStatsFilePath = "repo-stats.csv";
-const migrationAuditFilePath = "migration-audit.csv";
-const outputCsvFilePath = "output.csv";
-
-// All the 'type's in the migration audit output
-const migrationTypes = new Set();
-
-const readCsv = (filePath) => {
-  return new Promise((resolve, reject) => {
-    const data = [];
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on("data", (row) => data.push(row))
-      .on("end", () => {
-        console.log(`\tRead "${filePath}"`);
-        resolve(data);
-      })
-      .on("error", (error) => reject(error));
-  });
-};
-
-// Combine data from both CSV files
-const combineStatsAndAuditData = (repoStatsData, migrationAuditData) => {
-  migrationAuditData.forEach((row) => migrationTypes.add(row.type));
-
-  // For each row of repoStats, find matching rows in migrationAudit
-  // Create a new combined row and fill in data for each available migrationAudit header
-  return repoStatsData.map((repoStatsRow) => {
-    console.log(`\tProcessing "${repoStatsRow.Org_Name}/${repoStatsRow.Repo_Name}"`);
-
-    const matchingRows = migrationAuditData.filter(
-      (migrationAuditRow) =>
-        repoStatsRow.Org_Name.toLowerCase() === migrationAuditRow.owner.toLowerCase() &&
-        repoStatsRow.Repo_Name.toLowerCase() === migrationAuditRow.name.toLowerCase()
-    );
-
-    const combinedRow = { ...repoStatsRow, Has_Unmigratable: matchingRows.length > 0 };
-
-    // If the output displays a count, capture that, otherwise set the row to true
-    matchingRows.forEach((row) => {
-      const messageDigits = row.message.match(/\d+/);
-      combinedRow[row.type] = messageDigits ? messageDigits[0] : "1+";
-    });
-
-    // Set remaining new rows to 0
-    migrationTypes.forEach((type) => {
-      if (!combinedRow[type]) {
-        combinedRow[type] = 0;
-      }
-    });
-
-    return combinedRow;
-  });
-};
-
-const writeCsv = (filePath, headers, data) => {
-  const csvWriter = createCsvWriter({
-    path: filePath,
-    header: headers.map((header) => ({ id: header, title: header })),
-  });
-
-  return csvWriter.writeRecords(data);
-};
+const baseCsvFilePath = core.getInput('base_csv_file');
+const additionalCsvFilePath = core.getInput('additional_csv_file');
+const outputCsvFilePath = core.getInput('output_file');
+const headerColumn = core.getInput('header_column');
+const baseCsvColumns = core.getInput('base_csv_columns').split(',');
+const additionalCsvColumns = core.getInput('additional_csv_columns').split(',');
+const mode = core.getInput('mode') || 'default';
 
 const processCsvFiles = async () => {
   try {
-    console.log(`Reading input CSVs: "${repoStatsFilePath}", "${migrationAuditFilePath}"`);
-    const [repoStatsData, migrationAuditData] = await Promise.all([
-      readCsv(repoStatsFilePath),
-      readCsv(migrationAuditFilePath),
-    ]);
+    core.info(`Reading input CSVs: "${baseCsvFilePath}", "${additionalCsvFilePath}"`);
 
-    console.log("Combining data");
-    const combinedData = combineStatsAndAuditData(repoStatsData, migrationAuditData);
+    // Read the base CSV file
+    core.info(`Reading base CSV file: "${baseCsvFilePath}"`);
+    const baseCsvData = await readCsv(baseCsvFilePath);
+    core.info(`Read base CSV file: "${baseCsvFilePath}"`);
 
-    const headers = [...Object.keys(repoStatsData[0]), "Has_Unmigratable", ...Array.from(migrationTypes)];
+    // Read the additional CSV file
+    core.info(`Reading additional CSV file: "${additionalCsvFilePath}"`);
+    const additionalCsvData = await readCsv(additionalCsvFilePath);
+    core.info(`Read additional CSV file: "${additionalCsvFilePath}"`);
 
-    console.log(`Writing "${outputCsvFilePath}"`);
+    core.info("Combining data");
+    const { combinedData, migrationTypes } = combineBaseAndAdditionalData(baseCsvData, additionalCsvData, baseCsvColumns, additionalCsvColumns, headerColumn, mode);
+
+    // Determine the headers for the output CSV file based on the selected mode
+    core.info(`Determining headers for the output CSV file`);
+    const headers = determineHeaders(baseCsvData, additionalCsvData, additionalCsvColumns, mode, migrationTypes);
+    core.debug(`Combined headers: ${headers}`);
+    core.info(`Determined headers for the output CSV file`);
+
+    core.info(`Writing "${outputCsvFilePath}"`);
     await writeCsv(outputCsvFilePath, headers, combinedData);
 
-    console.log("The CSV file was written successfully");
+    core.info("The CSV file was written successfully");
   } catch (error) {
-    console.error("Error processing CSV files:", error);
+    core.error("Error processing CSV files:", error);
+    core.setFailed(error.message);
   }
 };
 
