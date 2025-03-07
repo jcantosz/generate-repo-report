@@ -104,3 +104,12 @@ jobs:
           name: report
           path: combined-output.csv
           retention-days: 7
+
+      - name: Bundle up all output files
+        uses: actions/upload-artifact@v4
+        with:
+          name: outputs
+          path: |
+            *.csv
+            *.txt
+          retention-days: 7
