@@ -1,16 +1,18 @@
 {
-  "name": "csv-combiner",
+  "name": "csv-combiner-root",
   "version": "1.0.0",
-  "description": "",
-  "main": "combine-csv.js",
+  "description": "Root package for CSV combiner actions",
+  "private": true,
+  "workspaces": [
+    "common",
+    "combine-columns",
+    "rows-to-columns"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run build:combine-columns && npm run build:rows-to-columns",
+    "build:combine-columns": "cd combine-columns && npm run build",
+    "build:rows-to-columns": "cd rows-to-columns && npm run build"
   },
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@actions/core": "^1.11.1",
-    "csv-parser": "^3.2.0",
-    "csv-writer": "^1.6.0"
-  }
+  "license": "ISC"
 }

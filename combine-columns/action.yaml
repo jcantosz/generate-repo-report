@@ -1,0 +1,28 @@
+name: 'Combine CSV Columns'
+description: 'A GitHub Action to combine two CSV files by merging columns from both files based on matching rows.'
+author: 'Your Name <your.email@example.com>'
+
+inputs:
+  base_csv_file:
+    description: 'Path to the base CSV file.'
+    required: true
+  additional_csv_file:
+    description: 'Path to the additional CSV file.'
+    required: true
+  output_file:
+    description: 'Path to the output CSV file.'
+    required: true
+  base_csv_columns:
+    description: 'Comma-separated list of columns in the base CSV to check for equality.'
+    required: true
+  additional_csv_columns:
+    description: 'Comma-separated list of columns in the additional CSV to check for equality.'
+    required: true
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'columns'
+  color: 'blue'

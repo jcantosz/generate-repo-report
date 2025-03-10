@@ -1,0 +1,26 @@
+name: Rows to Columns CSV Converter
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  convert-csv:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Convert CSV rows to columns
+      uses: jcantosz/generate-repo-report/rows-to-columns@main
+      with:
+        base_csv_file: 'repo-stats.csv'
+        additional_csv_file: 'migration-audit.csv'
+        output_file: 'output.csv'
+        header_column_keys: 'type'
+        header_column_values: 'message'
+        base_csv_columns: 'Org_Name,Repo_Name'
+        additional_csv_columns: 'owner,name'

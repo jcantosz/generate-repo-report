@@ -1,0 +1,34 @@
+name: 'Rows to Columns CSV Converter'
+description: 'A GitHub Action to convert rows from additional CSV into columns in base CSV based on matching rows.'
+author: 'Your Name <your.email@example.com>'
+
+inputs:
+  base_csv_file:
+    description: 'Path to the base CSV file.'
+    required: true
+  additional_csv_file:
+    description: 'Path to the additional CSV file.'
+    required: true
+  output_file:
+    description: 'Path to the output CSV file.'
+    required: true
+  header_column_keys:
+    description: 'Column in the additional CSV to use as headers in the combined CSV.'
+    required: true
+  header_column_values:
+    description: 'Column in the base CSV to use as values in the combined CSV.'
+    required: true
+  base_csv_columns:
+    description: 'Comma-separated list of columns in the base CSV to check for equality.'
+    required: true
+  additional_csv_columns:
+    description: 'Comma-separated list of columns in the additional CSV to check for equality.'
+    required: true
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'table'
+  color: 'purple'

@@ -1,0 +1,19 @@
+{
+  "name": "combine-columns",
+  "version": "1.0.0",
+  "description": "GitHub Action to combine columns from two CSV files based on matching rows",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd ../common && npm install",
+    "build": "ncc build index.js -o dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.11.1"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1"
+  }
+}

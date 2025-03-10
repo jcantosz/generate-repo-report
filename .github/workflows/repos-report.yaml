@@ -66,37 +66,24 @@ jobs:
       # combine repo proects and repo stats by calling generate-repo-report in direct mode
       - name: Combine reports
         id: combine-reports
-        uses: jcantosz/generate-repo-report@main
+        uses: jcantosz/generate-repo-report/combine-columns@main
         with:
           base_csv_file: 'repo-stats.csv'
           additional_csv_file: 'repo-projects.csv'
           output_file: 'stats-and-projects.csv'
           base_csv_columns: 'Org_Name,Repo_Name'
           additional_csv_columns: 'org_name,repo_name'
-          mode: 'direct'
       
-      - uses: jcantosz/generate-repo-report@main
+      - uses: jcantosz/generate-repo-report/rows-to-columns@main
         with:
           base_csv_file: 'stats-and-projects.csv'
           additional_csv_file: 'migration-audit.csv'
           output_file: 'combined-output.csv'
-          header_column: 'type'
+          header_column_keys: 'type'
+          header_column_values: 'message'
           base_csv_columns: 'Org_Name,Repo_Name'
           additional_csv_columns: 'owner,name'
-          mode: 'default'
-      
-        # or, to call directly
-        #   - name: Combine reports
-        # run: |
-        #   node dist/index.js
-        # env:
-        #   INPUT_BASE_CSV_FILE: 'repo-stats.csv'
-        #   INPUT_ADDITIONAL_CSV_FILE: 'migration-audit.csv'
-        #   INPUT_OUTPUT_FILE: 'output.csv'
-        #   INPUT_HEADER_COLUMN: 'type'
-        #   INPUT_BASE_CSV_COLUMNS: 'Org_Name,Repo_Name'
-        #   INPUT_ADDITIONAL_CSV_COLUMNS: 'owner,name'
-        #   INPUT_MODE: 'default'
+
 
       - name: upload combined report
         uses: actions/upload-artifact@v4

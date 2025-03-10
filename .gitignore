@@ -1,5 +1,7 @@
+**/node_modules/
 node_modules/
 .scratch/
 *.csv
 *.env
 *.txt
+!**/examples/*.csv

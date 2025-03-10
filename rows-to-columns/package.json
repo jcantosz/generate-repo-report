@@ -1,0 +1,19 @@
+{
+  "name": "rows-to-columns",
+  "version": "1.0.0",
+  "description": "GitHub Action to convert rows from an additional CSV into columns in a base CSV",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd ../common && npm install",
+    "build": "ncc build index.js -o dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.11.1"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1"
+  }
+}

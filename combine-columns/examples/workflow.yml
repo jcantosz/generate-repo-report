@@ -1,0 +1,24 @@
+name: Combine CSV Columns
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  combine-csv:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Combine CSV files
+      uses: ./combine-columns
+      with:
+        base_csv_file: 'base-data.csv'
+        additional_csv_file: 'additional-data.csv'
+        output_file: 'combined-output.csv'
+        base_csv_columns: 'Org_Name,Repo_Name'
+        additional_csv_columns: 'owner,name'

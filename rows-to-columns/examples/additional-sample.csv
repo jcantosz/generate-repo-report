@@ -1,0 +1,8 @@
+owner,name,type,message,severity
+acme-org,frontend-app,dependency,3 outdated dependencies found,medium
+acme-org,frontend-app,security,1 security vulnerability found,high
+acme-org,backend-api,linting,5 linting issues found,low
+acme-org,data-processor,security,2 security vulnerabilities found,high
+demo-org,website,dependency,1 outdated dependency found,low
+demo-org,mobile-app,security,3 security vulnerabilities found,critical
+demo-org,mobile-app,testing,4 failing tests detected,medium
