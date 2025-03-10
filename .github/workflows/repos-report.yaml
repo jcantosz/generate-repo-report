@@ -53,8 +53,8 @@ jobs:
       # uses the token to get a list of repos and saves them to a file, 1 repo per line
       - name: Get list of repos
         run: |
-          echo gh repo list ${ORG} --json name --jq '.[] | "\(.name)"' \| tee repos.txt
-          gh repo list ${ORG} --json name --jq '.[] | "\(.name)"' | tee repos.txt
+           echo gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /orgs/$ORG/repos  --paginate -X GET  --jq '.[] | "\(.name)"' \| tee repos.txt
+           gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /orgs/$ORG/repos  --paginate -X GET  --jq '.[] | "\(.name)"' | tee repos.txt
 
       - uses: jcantosz/Count-repo-projects@main
         with:
@@ -90,4 +90,13 @@ jobs:
         with:
           name: report
           path: combined-output.csv
+          retention-days: 7
+      
+      - name: Bundle up all output files
+        uses: actions/upload-artifact@v4
+        with:
+          name: outputs
+          path: |
+            *.csv
+            *.txt
           retention-days: 7
