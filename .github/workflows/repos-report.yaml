@@ -63,20 +63,37 @@ jobs:
           org_name: 'jcantosz-test-org'
           output_file: 'repo-projects.csv'
 
-      # combine repo proects and repo stats by calling generate-repo-report in direct mode
+      # This action needs a PAT, cannot use an app token
+      - name: Run Project Count
+        uses: jcantosz/org-app-stats@main
+        with:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_ORG: 'jcantosz-test-org'
+          OUTPUT_DIR: '.'
+
+      - name: Combine stats and apps outputs
+        id: combine-projects-apps
+        uses: jcantosz/generate-repo-report/combine-columns@main
+        with:
+          base_csv_file: 'repo-projects.csv'
+          additional_csv_file: 'per-repo-installation.csv'
+          output_file: 'repo-projects-and-apps.csv'
+          base_csv_columns: 'org_name,repo_name'
+          additional_csv_columns: 'org_name,repo_name'
+
       - name: Combine reports
         id: combine-reports
         uses: jcantosz/generate-repo-report/combine-columns@main
         with:
           base_csv_file: 'repo-stats.csv'
-          additional_csv_file: 'repo-projects.csv'
-          output_file: 'stats-and-projects.csv'
+          additional_csv_file: 'repo-projects-and-apps.csv'
+          output_file: 'stats-projects-and-apps.csv'
           base_csv_columns: 'Org_Name,Repo_Name'
           additional_csv_columns: 'org_name,repo_name'
       
       - uses: jcantosz/generate-repo-report/rows-to-columns@main
         with:
-          base_csv_file: 'stats-and-projects.csv'
+          base_csv_file: 'stats-projects-and-apps.csv'
           additional_csv_file: 'migration-audit.csv'
           output_file: 'combined-output.csv'
           header_column_keys: 'type'
