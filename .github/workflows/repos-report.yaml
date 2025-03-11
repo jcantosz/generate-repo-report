@@ -71,22 +71,23 @@ jobs:
           GITHUB_ORG: 'jcantosz-test-org'
           OUTPUT_DIR: '.'
 
+      # Combine all against stats so we retain all the repos data for repos it has listed
       - name: Combine stats and apps outputs
         id: combine-projects-apps
         uses: jcantosz/generate-repo-report/combine-columns@main
         with:
-          base_csv_file: 'repo-projects.csv'
-          additional_csv_file: 'per-repo-installation.csv'
-          output_file: 'repo-projects-and-apps.csv'
-          base_csv_columns: 'org_name,repo_name'
+          base_csv_file: 'repo-stats.csv'
+          additional_csv_file: 'repo-projects.csv'
+          output_file: 'repo-stats-and-projects.csv'
+          base_csv_columns: 'Org_Name,Repo_Name'
           additional_csv_columns: 'org_name,repo_name'
 
       - name: Combine reports
         id: combine-reports
         uses: jcantosz/generate-repo-report/combine-columns@main
         with:
-          base_csv_file: 'repo-stats.csv'
-          additional_csv_file: 'repo-projects-and-apps.csv'
+          base_csv_file: 'repo-stats-and-projects.csv'
+          additional_csv_file: 'per-repo-installations.csv'
           output_file: 'stats-projects-and-apps.csv'
           base_csv_columns: 'Org_Name,Repo_Name'
           additional_csv_columns: 'org_name,repo_name'
