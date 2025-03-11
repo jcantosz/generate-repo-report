@@ -1,0 +1,14 @@
+on: 
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Run Project Count
+      uses: jcantosz/org-app-stats@main
+      with:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        GITHUB_ORG: 'jcantosz-test-org'
+        output_dir: 'csv_output'
