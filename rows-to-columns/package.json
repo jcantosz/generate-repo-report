@@ -15,5 +15,6 @@
   },
   "devDependencies": {
     "@vercel/ncc": "^0.38.1"
-  }
+  },
+  "type": "module"
 }

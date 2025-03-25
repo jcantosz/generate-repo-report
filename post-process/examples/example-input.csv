@@ -5,3 +5,5 @@ acme-org,data-processor,Java,6,3200,,2 security vulnerabilities found,,
 demo-org,website,HTML,9,1500,1 outdated dependency found,,,
 demo-org,mobile-app,Swift,7,3800,,3 security vulnerabilities found,,4 failing tests detected
 test-org,utilities,Go,3,950,,,,
+test-org,quoted-commas,,,,"This repository has one or more custom properties assigned to it, which will not be migrated",,,
+test-org,utilities-2,,,,,,,

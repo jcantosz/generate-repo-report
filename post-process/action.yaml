@@ -1,0 +1,21 @@
+name: "CSV Post-Processor"
+description: "A GitHub Action to process CSV data using configurable rules for transformation and standardization."
+
+inputs:
+  input_csv:
+    description: "Path to the input CSV file to be processed."
+    required: true
+  output_csv:
+    description: "Path where the processed output CSV file will be written."
+    required: true
+  rules_file:
+    description: "Path to the JSON rules configuration file."
+    required: true
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
+
+branding:
+  icon: "edit"
+  color: "green"
