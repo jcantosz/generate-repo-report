@@ -2,7 +2,6 @@ import Ajv from "ajv";
 import fs from "fs";
 import path from "path";
 import * as core from "@actions/core";
-import schema from "../res/schema.json" assert { type: "json" };
 import { getCSVHeaders, validateColumnExistence } from "./csv-schema.js";
 
 /**
@@ -15,7 +14,21 @@ export default class SchemaValidator {
       verbose: true,
       strictTuples: false,
     });
-    this.validator = this.ajv.compile(schema);
+
+    // Dynamically load schema
+    try {
+      // Get the path to the schema file relative to this file
+      const schemaPath = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../res/schema.json");
+
+      // Read and parse the schema file
+      const schemaContent = fs.readFileSync(schemaPath, "utf8");
+      const schema = JSON.parse(schemaContent);
+
+      this.validator = this.ajv.compile(schema);
+    } catch (error) {
+      core.error(`Failed to load schema: ${error.message}`);
+      throw new Error(`Failed to initialize validator: ${error.message}`);
+    }
   }
 
   /**

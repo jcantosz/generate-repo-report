@@ -34832,10 +34832,12 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /************************************************************************/
 var __webpack_exports__ = {};
 
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(9896);
 // EXTERNAL MODULE: external "path"
 var external_path_ = __nccwpck_require__(6928);
+// EXTERNAL MODULE: external "url"
+var external_url_ = __nccwpck_require__(7016);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(9896);
 // EXTERNAL MODULE: ../node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(6618);
 // EXTERNAL MODULE: ../node_modules/csv-parser/index.js
@@ -34904,8 +34906,6 @@ function safeCompareValues(value1, value2, caseSensitive = false) {
 
 // EXTERNAL MODULE: ../node_modules/ajv/dist/ajv.js
 var ajv = __nccwpck_require__(9793);
-;// CONCATENATED MODULE: ./res/schema.json
-const schema_namespaceObject = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/draft-07/schema#","title":"CSV Post-Process Config Schema","description":"Schema for validating CSV post-processing configuration","type":"object","required":["rules"],"properties":{"rules":{"type":"array","description":"Array of processing rules to apply to CSV columns","items":{"type":"object","required":["columns"],"properties":{"columns":{"type":"array","description":"Array of column names or wildcards to apply this rule to","minItems":1,"items":{"type":"string"}},"pattern":{"type":"string","description":"Regex pattern to match values in the specified columns"},"replacement":{"type":"string","description":"Replacement string for regex matches"},"fallback":{"description":"Value to use when pattern doesn\'t match","oneOf":[{"type":"string"},{"type":"boolean"},{"type":"number"}]},"emptyValue":{"description":"Value to use when the cell is empty","oneOf":[{"type":"string"},{"type":"boolean"},{"type":"number"}]}}}},"processColumns":{"type":"object","description":"Configuration for which columns to process","properties":{"columns":{"type":"array","description":"Explicit list of column names to process","items":{"type":"string"}},"columnRanges":{"type":"array","description":"Ranges of columns to process","items":{"oneOf":[{"type":"number","description":"Single column index"},{"type":"object","description":"Column range with start and/or end","properties":{"start":{"type":"number","description":"Start index (inclusive)"},"end":{"type":"number","description":"End index (exclusive)"}}}]}}}},"indicatorColumns":{"type":"array","description":"Configuration for indicator columns to generate","items":{"type":"object","required":["name","trueValue","falseValue"],"properties":{"name":{"type":"string","description":"Name of the indicator column to generate"},"sourceColumns":{"type":"array","description":"Source columns to check for the indicator","items":{"type":"string"}},"sourceColumnRanges":{"type":"array","description":"Ranges of source columns to check","items":{"oneOf":[{"type":"number","description":"Single column index"},{"type":"object","description":"Column range with start and/or end","properties":{"start":{"type":"number","description":"Start index (inclusive)"},"end":{"type":"number","description":"End index (exclusive)"}}}]}},"trueValue":{"description":"Value to use when indicator condition is true","oneOf":[{"type":"string"},{"type":"boolean"},{"type":"number"}]},"falseValue":{"description":"Value to use when indicator condition is false","oneOf":[{"type":"string"},{"type":"boolean"},{"type":"number"}]}}}}}}');
 ;// CONCATENATED MODULE: ./src/csv-schema.js
 
 
@@ -35007,7 +35007,6 @@ function validateColumnExistence(rules, headers) {
 
 
 
-
 /**
  * Schema-based validator for CSV post-processing configuration
  */
@@ -35018,7 +35017,21 @@ class SchemaValidator {
       verbose: true,
       strictTuples: false,
     });
-    this.validator = this.ajv.compile(schema_namespaceObject);
+
+    // Dynamically load schema
+    try {
+      // Get the path to the schema file relative to this file
+      const schemaPath = __nccwpck_require__.ab + "schema.json";
+
+      // Read and parse the schema file
+      const schemaContent = external_fs_.readFileSync(__nccwpck_require__.ab + "schema.json", "utf8");
+      const schema = JSON.parse(schemaContent);
+
+      this.validator = this.ajv.compile(schema);
+    } catch (error) {
+      core.error(`Failed to load schema: ${error.message}`);
+      throw new Error(`Failed to initialize validator: ${error.message}`);
+    }
   }
 
   /**
@@ -35634,6 +35647,11 @@ function processData(csvData, rulesConfig) {
 
 
 
+
+// ES Module equivalent for __dirname
+const main_filename = (0,external_url_.fileURLToPath)(import.meta.url);
+const main_dirname = external_path_.dirname(main_filename);
+
 async function run() {
   try {
     // Get inputs
@@ -35674,12 +35692,26 @@ async function run() {
   }
 }
 
+// Run the script if it's called directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  run().catch((error) => {
+    console.error("Error:", error);
+    process.exit(1);
+  });
+}
+
 ;// CONCATENATED MODULE: ./index.js
 /**
  * The entrypoint for the action. This file simply imports and runs the action's
  * main logic.
  */
 
+
+
+
+// ES Module equivalent for __dirname
+const index_filename = (0,external_url_.fileURLToPath)(import.meta.url);
+const index_dirname = external_path_.dirname(index_filename);
 
 run();
 
