@@ -6,12 +6,14 @@
   "workspaces": [
     "common",
     "combine-columns",
-    "rows-to-columns"
+    "rows-to-columns",
+    "post-process"
   ],
   "scripts": {
-    "build": "npm run build:combine-columns && npm run build:rows-to-columns",
+    "build": "npm run build:combine-columns && npm run build:rows-to-columns && npm run build:post-process",
     "build:combine-columns": "cd combine-columns && npm run build",
-    "build:rows-to-columns": "cd rows-to-columns && npm run build"
+    "build:rows-to-columns": "cd rows-to-columns && npm run build",
+    "build:post-process": "cd post-process && npm run build"
   },
   "author": "",
   "license": "ISC"

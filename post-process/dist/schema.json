@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CSV Post-Process Config Schema",
+  "description": "Schema for validating CSV post-processing configuration",
+  "type": "object",
+  "required": ["rules"],
+  "properties": {
+    "rules": {
+      "type": "array",
+      "description": "Array of processing rules to apply to CSV columns",
+      "items": {
+        "type": "object",
+        "required": ["columns"],
+        "properties": {
+          "columns": {
+            "type": "array",
+            "description": "Array of column names or wildcards to apply this rule to",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "pattern": {
+            "type": "string",
+            "description": "Regex pattern to match values in the specified columns"
+          },
+          "replacement": {
+            "type": "string",
+            "description": "Replacement string for regex matches"
+          },
+          "fallback": {
+            "description": "Value to use when pattern doesn't match",
+            "oneOf": [{ "type": "string" }, { "type": "boolean" }, { "type": "number" }]
+          },
+          "emptyValue": {
+            "description": "Value to use when the cell is empty",
+            "oneOf": [{ "type": "string" }, { "type": "boolean" }, { "type": "number" }]
+          }
+        }
+      }
+    },
+    "processColumns": {
+      "type": "object",
+      "description": "Configuration for which columns to process",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "description": "Explicit list of column names to process",
+          "items": {
+            "type": "string"
+          }
+        },
+        "columnRanges": {
+          "type": "array",
+          "description": "Ranges of columns to process",
+          "items": {
+            "oneOf": [
+              {
+                "type": "number",
+                "description": "Single column index"
+              },
+              {
+                "type": "object",
+                "description": "Column range with start and/or end",
+                "properties": {
+                  "start": {
+                    "type": "number",
+                    "description": "Start index (inclusive)"
+                  },
+                  "end": {
+                    "type": "number",
+                    "description": "End index (exclusive)"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "indicatorColumns": {
+      "type": "array",
+      "description": "Configuration for indicator columns to generate",
+      "items": {
+        "type": "object",
+        "required": ["name", "trueValue", "falseValue"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the indicator column to generate"
+          },
+          "sourceColumns": {
+            "type": "array",
+            "description": "Source columns to check for the indicator",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sourceColumnRanges": {
+            "type": "array",
+            "description": "Ranges of source columns to check",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "description": "Single column index"
+                },
+                {
+                  "type": "object",
+                  "description": "Column range with start and/or end",
+                  "properties": {
+                    "start": {
+                      "type": "number",
+                      "description": "Start index (inclusive)"
+                    },
+                    "end": {
+                      "type": "number",
+                      "description": "End index (exclusive)"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "trueValue": {
+            "description": "Value to use when indicator condition is true",
+            "oneOf": [{ "type": "string" }, { "type": "boolean" }, { "type": "number" }]
+          },
+          "falseValue": {
+            "description": "Value to use when indicator condition is false",
+            "oneOf": [{ "type": "string" }, { "type": "boolean" }, { "type": "number" }]
+          }
+        }
+      }
+    }
+  }
+}

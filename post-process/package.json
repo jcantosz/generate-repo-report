@@ -1,7 +1,7 @@
 {
-  "name": "combine-columns",
+  "name": "csv-post-process",
   "version": "1.0.0",
-  "description": "GitHub Action to combine columns from two CSV files based on matching rows",
+  "description": "Post-process CSV data using configurable rules",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,10 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@actions/core": "^1.11.1"
-  },
-  "devDependencies": {
-    "@vercel/ncc": "^0.38.1"
+    "@actions/core": "^1.11.1",
+    "ajv": "^8.17.1"
   },
   "type": "module"
 }

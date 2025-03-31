@@ -1,0 +1,9 @@
+Org_Name,Repo_Name,repository-releases,Language,Contributors,Size_KB,dependency,security,linting,testing
+acme-org,frontend-app,1 GB,JavaScript,15,4500,3 outdated dependencies found,1 security vulnerability found,,
+acme-org,backend-api,10 GB,Python,8,2800,,,5 linting issues found,
+acme-org,data-processor,5,Java,6,3200,,2 security vulnerabilities found,,
+demo-org,website,,HTML,9,1500,1 outdated dependency found,,,
+demo-org,mobile-app,ok,Swift,7,3800,,3 security vulnerabilities found,,4 failing tests detected
+test-org,utilities,,Go,3,950,,,,,
+test-org,quoted-commas,,,,,"This repository has one or more custom properties assigned to it, which will not be migrated",,,
+test-org,utilities-2,,,,,,,,
