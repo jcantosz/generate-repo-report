@@ -28232,10 +28232,6 @@ module.exports = parseParams
 /************************************************************************/
 var __webpack_exports__ = {};
 
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(6928);
-// EXTERNAL MODULE: external "url"
-var external_url_ = __nccwpck_require__(7016);
 // EXTERNAL MODULE: ../node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(6618);
 // EXTERNAL MODULE: external "fs"
@@ -28369,16 +28365,16 @@ function determineHeaders(baseCsvData, migrationTypes) {
   return [...Object.keys(baseCsvData[0]), ...Array.from(migrationTypes)];
 }
 
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(6928);
+// EXTERNAL MODULE: external "url"
+var external_url_ = __nccwpck_require__(7016);
 ;// CONCATENATED MODULE: ./main.js
 
 
 
 
 
-
-// ES Module equivalent for __dirname
-const main_filename = (0,external_url_.fileURLToPath)(import.meta.url);
-const main_dirname = external_path_.dirname(main_filename);
 
 async function run() {
   try {
@@ -28438,12 +28434,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
  * main logic.
  */
 
-
-
-
-// ES Module equivalent for __dirname
-const index_filename = (0,external_url_.fileURLToPath)(import.meta.url);
-const index_dirname = external_path_.dirname(index_filename);
 
 run();
 
