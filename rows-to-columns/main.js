@@ -47,11 +47,3 @@ export async function run() {
     core.setFailed(error.message);
   }
 }
-
-// Run the script if it's called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  run().catch((error) => {
-    console.error("Error:", error);
-    process.exit(1);
-  });
-}
